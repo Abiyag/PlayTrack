@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;600&display=swap');
+
+:root {
+  --bg:          #0a0f0a;
+  --surface:     #111711;
+  --card:        #162016;
+  --border:      #1e2e1e;
+  --accent:      #4ade80;
+  --accent-dim:  #22c55e;
+  --accent-glow: rgba(74, 222, 128, 0.15);
+  --red:         #f87171;
+  --yellow:      #fbbf24;
+  --text:        #e8f5e8;
+  --muted:       #6b8f6b;
+  --dimmed:      #3a5a3a;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow Condensed', sans-serif;
+  min-height: 100vh;
+}
+
+input, select, button, textarea {
+  font-family: inherit;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.12);
+}
+
+button:hover { opacity: 0.88; cursor: pointer; }
+
+select option { background: #111711; }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5) sepia(1) hue-rotate(90deg);
+}
+
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }

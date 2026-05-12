@@ -1,0 +1,15 @@
+.injuries-history { margin-top: 1.5rem; }
+
+.injury-type {
+  font-weight: 800;
+  font-size: 1rem;
+  flex: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-select {
+  width: auto;
+  font-size: 0.78rem;
+  padding: 0.25rem 0.5rem;
+}
