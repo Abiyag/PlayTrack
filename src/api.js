@@ -1,4 +1,4 @@
-const BASE = "http://localhost:3001/api";
+const BASE = "https://playtrack-xp95.onrender.com/api";
 
 // Helper — adds the auth token to every request automatically
 function headers() {
