@@ -1,45 +1,67 @@
+require("dotenv").config();
 const express  = require("express");
 const bcrypt   = require("bcryptjs");
 const jwt      = require("jsonwebtoken");
-const db       = require("../db");
+const pool     = require("../db");
 
 const router     = express.Router();
 const SECRET_KEY = "playtrack_secret_key";
 
 // Register
-router.post("/register", (req, res) => {
+router.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password)
     return res.status(400).json({ error: "All fields are required." });
 
-  const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
-  if (existing)
-    return res.status(400).json({ error: "Email already registered." });
+  try {
+    const existing = await pool.query(
+      "SELECT id FROM users WHERE email = $1", [email]
+    );
+    if (existing.rows.length > 0)
+      return res.status(400).json({ error: "Email already registered." });
 
-  const password_hash = bcrypt.hashSync(password, 10);
-  const result = db.prepare(
-    "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)"
-  ).run(name, email, password_hash);
+    const password_hash = bcrypt.hashSync(password, 10);
+    const result = await pool.query(
+      "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id",
+      [name, email, password_hash]
+    );
 
-  const token = jwt.sign({ id: result.lastInsertRowid, name }, SECRET_KEY);
-  res.json({ token, name });
+    const token = jwt.sign(
+      { id: result.rows[0].id, name }, SECRET_KEY
+    );
+    res.json({ token, name });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
+  }
 });
 
 // Login
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
-  if (!user)
-    return res.status(400).json({ error: "Invalid email or password." });
+  try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email = $1", [email]
+    );
+    const user = result.rows[0];
 
-  const valid = bcrypt.compareSync(password, user.password_hash);
-  if (!valid)
-    return res.status(400).json({ error: "Invalid email or password." });
+    if (!user)
+      return res.status(400).json({ error: "Invalid email or password." });
 
-  const token = jwt.sign({ id: user.id, name: user.name }, SECRET_KEY);
-  res.json({ token, name: user.name });
+    const valid = bcrypt.compareSync(password, user.password_hash);
+    if (!valid)
+      return res.status(400).json({ error: "Invalid email or password." });
+
+    const token = jwt.sign(
+      { id: user.id, name: user.name }, SECRET_KEY
+    );
+    res.json({ token, name: user.name });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
+  }
 });
 
 module.exports = router;
