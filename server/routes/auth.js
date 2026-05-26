@@ -9,7 +9,8 @@ const SECRET_KEY = "playtrack_secret_key";
 
 // Register
 router.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, password } = req.body;
+const email = req.body.email.toLowerCase();
 
   if (!name || !email || !password)
     return res.status(400).json({ error: "All fields are required." });
@@ -39,7 +40,8 @@ router.post("/register", async (req, res) => {
 
 // Login
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { password } = req.body;
+const email = req.body.email.toLowerCase();
 
   try {
     const result = await pool.query(
